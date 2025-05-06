@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "830407545487",
+    "project_id": "ai-app-psychologist",
+    "storage_bucket": "ai-app-psychologist.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:830407545487:android:502c7bb40993874c9916fa",
+        "android_client_info": {
+          "package_name": "com.example.admin_panel"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAm5UQkCNFYcD_xzC9ugneOVwII1A6we8Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
