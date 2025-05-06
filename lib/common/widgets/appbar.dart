@@ -1,4 +1,6 @@
 import 'package:admin_panel/common/cubit/system_cubit.dart';
+import 'package:admin_panel/common/cubit/theme_cubit.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:admin_panel/common/widgets/nav_button.dart';
 import 'package:admin_panel/core/configs/assets.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +20,10 @@ List<Widget> appBarActions(BuildContext context) {
     }),
     navButton(Icons.settings, 'הגדרות', () {
       Navigator.pushNamed(context, '/config');
+    }),
+    // Theme toggle
+    navButton(Icons.brightness_6, 'Theme', () {
+      context.read<ThemeCubit>().toggle();
     }),
 
   ];

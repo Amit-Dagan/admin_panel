@@ -1,4 +1,6 @@
 import 'package:admin_panel/common/cubit/system_cubit.dart';
+import 'package:admin_panel/common/cubit/theme_cubit.dart';
+import 'package:admin_panel/core/configs/theme.dart';
 import 'package:admin_panel/firebase_options.dart';
 import 'package:admin_panel/presentation/auth/pages/signup.dart';
 import 'package:admin_panel/presentation/auth/pages/singin.dart';
@@ -34,27 +36,33 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => SystemCubit(),
-      child: Builder(
-        builder: (context) {
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => SystemCubit()),
+        BlocProvider(create: (_) => ThemeCubit()),
+      ],
+      child: BlocBuilder<ThemeCubit, ThemeMode>(
+        builder: (context, themeMode) {
           return MaterialApp(
+            theme: AppThemes.light,
+            darkTheme: AppThemes.dark,
+            themeMode: themeMode,
             locale: context.watch<SystemCubit>().currentLocale,
             supportedLocales: const [Locale('en'), Locale('he')],
             builder:
                 (context, child) => ResponsiveBreakpoints.builder(
-                  child: child!,
-                  breakpoints: [
-                    const Breakpoint(start: 0, end: 450, name: MOBILE),
-                    const Breakpoint(start: 451, end: 800, name: TABLET),
-                    const Breakpoint(start: 801, end: 1920, name: DESKTOP),
-                    const Breakpoint(
-                      start: 1921,
-                      end: double.infinity,
-                      name: '4K',
+                      child: child!,
+                      breakpoints: [
+                        const Breakpoint(start: 0, end: 450, name: MOBILE),
+                        const Breakpoint(start: 451, end: 800, name: TABLET),
+                        const Breakpoint(start: 801, end: 1920, name: DESKTOP),
+                        const Breakpoint(
+                          start: 1921,
+                          end: double.infinity,
+                          name: '4K',
+                        ),
+                      ],
                     ),
-                  ],
-                ),
             initialRoute: '/signin',
             routes: {
               '/signin': (context) => SigninPage(),
