@@ -4,6 +4,8 @@ import 'package:admin_panel/domain/entities/chat_config.dart';
 import 'package:admin_panel/domain/usecase/chat/get_chat_config.dart';
 import 'package:admin_panel/domain/usecase/chat/set_chat_config.dart';
 import 'package:admin_panel/service_locator.dart';
+import 'package:admin_panel/common/cubit/theme_cubit.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// A screen allowing the admin to select and save the ChatGPT model.
 class ConfigPage extends StatefulWidget {
@@ -117,8 +119,26 @@ class _ConfigPageState extends State<ConfigPage> {
                               )
                             : const Text('Save'),
                       ),
-                    ],
+                      ],
                   ),
+                // Theme selector
+                const SizedBox(height: 24),
+                Text(
+                  'Theme',
+                  style: Theme.of(context).textTheme.headline6,
+                ),
+                BlocBuilder<ThemeCubit, ThemeMode>(
+                  builder: (context, mode) {
+                    return SwitchListTile(
+                      title: Text(
+                        mode == ThemeMode.dark ? 'Dark Mode' : 'Light Mode',
+                      ),
+                      value: mode == ThemeMode.dark,
+                      onChanged: (_) => context.read<ThemeCubit>().toggle(),
+                      activeColor: Theme.of(context).colorScheme.primary,
+                    );
+                  },
+                ),
       ),
     );
   }
