@@ -5,6 +5,7 @@ import 'package:admin_panel/presentation/auth/pages/singin.dart';
 import 'package:admin_panel/presentation/chat/chat_page.dart';
 import 'package:admin_panel/presentation/home/pages/home_page.dart';
 import 'package:admin_panel/service_locator.dart';
+import 'package:admin_panel/presentation/settings/config_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -60,6 +61,7 @@ class MyApp extends StatelessWidget {
               '/homePage': (context) => HomePage(),
               // '/customersPage': (context) => CustomersPage(),
               '/chatPage': (context) => ChatPage(),
+              '/config': (context) => const ConfigPage(),
             },
           );
         },

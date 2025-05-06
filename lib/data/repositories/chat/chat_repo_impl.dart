@@ -8,17 +8,11 @@ class ChatRepositoryImpl implements ChatRepository {
 
   @override
   Future<ChatEntity> sendMessage(ChatEntity chat) async {
-    // 1️⃣ append user turn
-    final withUser = chat.append(
-      Message(
-        role: Role.user,
-        content: /* user input */ chat.history.last.content,
-      ),
-    );
-    // 2️⃣ ask GPT
-    final assistantMsg = await sl<ChatService>().send(withUser.history);
-    // 3️⃣ return new entity with assistant appended
-    return withUser.append(assistantMsg);
+    // chat.history already includes the user's latest message
+    // Request GPT reply based on current history
+    final assistantMsg = await sl<ChatService>().send(chat.history);
+    // Return new entity with assistant message appended
+    return chat.append(assistantMsg);
   }
   
 

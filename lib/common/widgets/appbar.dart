@@ -16,7 +16,9 @@ List<Widget> appBarActions(BuildContext context) {
     navButton(Icons.people, 'מטופלים', () {
       Navigator.pushReplacementNamed(context, '/CustomersPage');
     }),
-    navButton(Icons.settings, 'הגדרות', () {}),
+    navButton(Icons.settings, 'הגדרות', () {
+      Navigator.pushNamed(context, '/config');
+    }),
 
   ];
 }

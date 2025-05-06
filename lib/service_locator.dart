@@ -5,6 +5,12 @@ import 'package:admin_panel/data/sources/chat/chat_service.dart';
 import 'package:admin_panel/domain/repositories/chat/chat.dart';
 import 'package:admin_panel/domain/repositories/customer/customer.dart';
 import 'package:admin_panel/domain/usecase/chat/send_message.dart';
+// Chat configuration imports
+import 'package:admin_panel/data/sources/chat/chat_config_service.dart';
+import 'package:admin_panel/data/repositories/chat/chat_config_repository_impl.dart';
+import 'package:admin_panel/domain/repositories/chat/chat_config_repository.dart';
+import 'package:admin_panel/domain/usecase/chat/get_chat_config.dart';
+import 'package:admin_panel/domain/usecase/chat/set_chat_config.dart';
 
 import '/data/sources/auth/auth_service.dart';
 import 'package:get_it/get_it.dart';
@@ -24,4 +30,9 @@ Future<void> initializeDependencies() async {
   sl.registerSingleton<SendMessageUseCase>(SendMessageUseCase());
   sl.registerSingleton<ChatRepository>(ChatRepositoryImpl());
   sl.registerSingleton<ChatService>(ChatServiceImpl());
+  // Chat configuration
+  sl.registerSingleton<ChatConfigService>(FirebaseChatConfigService());
+  sl.registerSingleton<ChatConfigRepository>(ChatConfigRepositoryImpl(sl()));
+  sl.registerSingleton<GetChatConfigUseCase>(GetChatConfigUseCase());
+  sl.registerSingleton<SetChatConfigUseCase>(SetChatConfigUseCase());
 }

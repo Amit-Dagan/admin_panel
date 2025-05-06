@@ -2,6 +2,8 @@
 import 'package:admin_panel/domain/entities/chat.dart';
 import 'package:dart_openai/dart_openai.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:admin_panel/domain/repositories/chat/chat_config_repository.dart';
+import 'package:admin_panel/service_locator.dart';
 
 // A pure data-source that only knows about the SDK and returns a Message:
 abstract class ChatService {
@@ -16,11 +18,15 @@ class ChatServiceImpl implements ChatService {
 
   @override
   Future<Message> send(List<Message> history) async {
-    OpenAI.apiKey = dotenv.env['OPENAI_APY_KEY'] ?? '';
-    print(history[history.length - 1].content);
+    // Load API key
+    OpenAI.apiKey = dotenv.env['OPENAI_API_KEY'] ?? '';
+    // Fetch saved model configuration
+    final config = await sl<ChatConfigRepository>().getChatConfig();
+    print('Using model: ${config.model}');
+    // last user message for debug
+    print(history.last.content);
     // map domain → SDK model
-    final sdkHistory =
-        history
+    final sdkHistory = history
             .map(
               (m) => OpenAIChatCompletionChoiceMessageModel(
                 role: OpenAIChatMessageRole.values.byName(m.role.name),
@@ -33,8 +39,9 @@ class ChatServiceImpl implements ChatService {
             )
             .toList();
 
+    // Invoke chat completion with selected model
     final chat = await OpenAI.instance.chat.create(
-      model: "gpt-4o",
+      model: config.model,
       messages: sdkHistory,
     );
     
