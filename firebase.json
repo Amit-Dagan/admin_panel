@@ -1,1 +1,1 @@
-
+{"flutter":{"platforms":{"android":{"default":{"projectId":"ai-app-psychologist","appId":"1:830407545487:android:502c7bb40993874c9916fa","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"ai-app-psychologist","configurations":{"android":"1:830407545487:android:502c7bb40993874c9916fa","ios":"1:830407545487:ios:afafcb74eebff0f99916fa","macos":"1:830407545487:ios:afafcb74eebff0f99916fa","web":"1:830407545487:web:a467ba121182b9a79916fa","windows":"1:830407545487:web:46ca50c1ca14a8fc9916fa"}}}}}}
