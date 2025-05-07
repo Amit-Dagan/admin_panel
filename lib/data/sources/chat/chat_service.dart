@@ -1,7 +1,6 @@
 // data/datasources/chat_remote_data_source.dart
 import 'package:admin_panel/domain/entities/chat.dart';
 import 'package:dart_openai/dart_openai.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:admin_panel/domain/repositories/chat/chat_config_repository.dart';
 import 'package:admin_panel/service_locator.dart';
 
@@ -58,9 +57,28 @@ class ChatServiceImpl implements ChatService {
     return Message(role: Role.assistant, content: text);
   }
 
-  Future<void> getModels() async {
-    print(OpenAI.instance.model.list().toString());
-    //return OpenAI.instance.model.list();
+Future<List<String>> getModels() async {
+    final all = await OpenAI.instance.model.list();
+
+    return all
+        .map((m) => m.id)
+        // only GPT engines
+        .where((id) => id.startsWith('gpt-'))
+        // but drop anything clearly not a pure chat engine
+        .where((id) {
+          final l = id.toLowerCase();
+          return !l.contains('dall') // image-generation
+              &&
+              !l.contains('audio') &&
+              !l.contains('image') &&
+              !l.contains('embedding') &&
+              !l.contains('search') &&
+              !l.contains('preview') &&
+              !l.contains('tts') &&
+              !l.contains('transcribe') &&
+              !l.contains('moderation');
+        })
+        .toList();
   }
 
   Future<String> _loadApiKeyFromSecureStorage() async {
