@@ -42,7 +42,7 @@ class DesktopAppbar extends StatelessWidget implements PreferredSizeWidget {
       textDirection: TextDirection.ltr,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 25),
-        color: Colors.white, // Or your preferred color
+        color: Theme.of(context).canvasColor, // Or your preferred color
         child: SafeArea(
           bottom: false,
           child: Row(
@@ -87,7 +87,7 @@ class MobileAppbar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).canvasColor,
       toolbarHeight: 100,
       elevation: 0,
       centerTitle: true,

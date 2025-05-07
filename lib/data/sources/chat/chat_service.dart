@@ -11,22 +11,18 @@ abstract class ChatService {
 }
 
 class ChatServiceImpl implements ChatService {
-  ChatRemoteDataSource() {
-    // ❗️Don’t hard-code your key in source!
-    
-  }
-
   @override
   Future<Message> send(List<Message> history) async {
+    getModels();
     // Load API key
-    OpenAI.apiKey = dotenv.env['OPENAI_API_KEY'] ?? '';
     // Fetch saved model configuration
     final config = await sl<ChatConfigRepository>().getChatConfig();
     print('Using model: ${config.model}');
     // last user message for debug
     print(history.last.content);
     // map domain → SDK model
-    final sdkHistory = history
+    final sdkHistory =
+        history
             .map(
               (m) => OpenAIChatCompletionChoiceMessageModel(
                 role: OpenAIChatMessageRole.values.byName(m.role.name),
@@ -44,7 +40,7 @@ class ChatServiceImpl implements ChatService {
       model: config.model,
       messages: sdkHistory,
     );
-    
+
     // extract assistant reply
     final sdkReply = chat.choices.first.message;
     print("RAW CONTENT ITEMS: ${sdkReply.content}");
@@ -53,13 +49,18 @@ class ChatServiceImpl implements ChatService {
         print(
           "  • type = ${item.type}, "
           "text = ${item.text}, "
-          "imageUrl = ${item.imageUrl}, "
+          "imageUrl = ${item.imageUrl}, ",
         );
       }
     }
-    final text = sdkReply.content!.map((c) => c.text).join().trim();  
+    final text = sdkReply.content!.map((c) => c.text).join().trim();
     print(text);
     return Message(role: Role.assistant, content: text);
+  }
+
+  Future<void> getModels() async {
+    print(OpenAI.instance.model.list().toString());
+    //return OpenAI.instance.model.list();
   }
 
   Future<String> _loadApiKeyFromSecureStorage() async {

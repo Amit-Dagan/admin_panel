@@ -8,6 +8,7 @@ import 'package:admin_panel/presentation/chat/chat_page.dart';
 import 'package:admin_panel/presentation/home/pages/home_page.dart';
 import 'package:admin_panel/service_locator.dart';
 import 'package:admin_panel/presentation/settings/config_page.dart';
+import 'package:dart_openai/dart_openai.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -28,6 +29,7 @@ Future<void> main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await initializeDependencies();
   await dotenv.load();
+  OpenAI.apiKey = dotenv.env['OPENAI_API_KEY'] ?? '';
   runApp(const MyApp());
 }
 
@@ -51,18 +53,18 @@ class MyApp extends StatelessWidget {
             supportedLocales: const [Locale('en'), Locale('he')],
             builder:
                 (context, child) => ResponsiveBreakpoints.builder(
-                      child: child!,
-                      breakpoints: [
-                        const Breakpoint(start: 0, end: 450, name: MOBILE),
-                        const Breakpoint(start: 451, end: 800, name: TABLET),
-                        const Breakpoint(start: 801, end: 1920, name: DESKTOP),
-                        const Breakpoint(
-                          start: 1921,
-                          end: double.infinity,
-                          name: '4K',
-                        ),
-                      ],
+                  child: child!,
+                  breakpoints: [
+                    const Breakpoint(start: 0, end: 450, name: MOBILE),
+                    const Breakpoint(start: 451, end: 800, name: TABLET),
+                    const Breakpoint(start: 801, end: 1920, name: DESKTOP),
+                    const Breakpoint(
+                      start: 1921,
+                      end: double.infinity,
+                      name: '4K',
                     ),
+                  ],
+                ),
             initialRoute: '/signin',
             routes: {
               '/signin': (context) => SigninPage(),

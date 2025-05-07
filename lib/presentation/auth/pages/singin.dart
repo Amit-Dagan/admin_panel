@@ -55,10 +55,7 @@ class SigninPage extends StatelessWidget {
         const SizedBox(height: 25),
         Image.asset(AppImages.logo),
         const SizedBox(height: 20),
-        const Text(
-          'Welcome Back!',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
+        
       ],
     );
   }
