@@ -1,6 +1,7 @@
 
 import 'package:admin_panel/data/sources/chat/chat_service.dart';
 import 'package:admin_panel/domain/entities/chat.dart';
+import 'package:admin_panel/domain/entities/chat_config.dart';
 import 'package:admin_panel/domain/repositories/chat/chat.dart';
 import 'package:admin_panel/service_locator.dart';
 
@@ -13,6 +14,11 @@ class ChatRepositoryImpl implements ChatRepository {
     final assistantMsg = await sl<ChatService>().send(chat.history);
     // Return new entity with assistant message appended
     return chat.append(assistantMsg);
+  }
+
+  @override
+  Future<List<String>> getChatModels() async {
+    return await sl<ChatService>().getModels();
   }
   
 

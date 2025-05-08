@@ -1,5 +1,6 @@
 import 'package:admin_panel/domain/entities/chat_config.dart';
 import 'package:admin_panel/domain/usecase/chat/get_chat_config.dart';
+import 'package:admin_panel/domain/usecase/chat/get_chat_models.dart';
 import 'package:admin_panel/domain/usecase/chat/set_chat_config.dart';
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
@@ -9,11 +10,7 @@ part 'config_state.dart';
 class ConfigCubit extends Cubit<ConfigState> {
   final GetChatConfigUseCase _getConfig;
   final SetChatConfigUseCase _setConfig;
-  static const List<String> availableModels = [
-    'gpt-3.5-turbo',
-    'gpt-4',
-    'gpt-4o',
-  ];
+  static late List<String> availableModels;
 
   ConfigCubit(this._getConfig, this._setConfig)
     : super(const ConfigState(isLoading: true)) {
@@ -22,6 +19,7 @@ class ConfigCubit extends Cubit<ConfigState> {
 
   Future<void> loadConfig() async {
     try {
+      availableModels = await getChatModelsUseCase().call();
       emit(state.copyWith(isLoading: true, error: null));
       final cfg = await _getConfig.call();
       emit(state.copyWith(isLoading: false, selectedModel: cfg.model));

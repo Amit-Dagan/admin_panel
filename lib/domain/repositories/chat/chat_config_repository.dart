@@ -7,4 +7,5 @@ abstract class ChatConfigRepository {
 
   /// Saves the provided chat configuration.
   Future<void> setChatConfig(ChatConfig config);
+
 }
