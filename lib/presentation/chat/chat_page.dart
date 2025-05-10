@@ -18,7 +18,6 @@ class ChatPage extends StatelessWidget {
     // Assume SystemCubit is provided above (e.g. in main.dart)
     final systemCubit = context.read<SystemCubit>();
     final userId = systemCubit.state.userId ?? '';
-
     return BlocProvider(
       create: (_) {
         // get your SendMessage use‐case however you like

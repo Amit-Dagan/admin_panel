@@ -18,11 +18,20 @@ class ConfigCubit extends Cubit<ConfigState> {
   }
 
   Future<void> loadConfig() async {
+    availableModels = await getChatModelsUseCase().call();
+
+    emit(state.copyWith(isLoading: true, error: null));
     try {
-      availableModels = await getChatModelsUseCase().call();
-      emit(state.copyWith(isLoading: true, error: null));
       final cfg = await _getConfig.call();
-      emit(state.copyWith(isLoading: false, selectedModel: cfg.model));
+      emit(
+        state.copyWith(
+          isLoading: false,
+          selectedModel: cfg.model,
+          temperature: cfg.temperature,
+          systemPrompt: cfg.systemPrompt,
+          pdfContent: cfg.pdfContent,
+        ),
+      );
     } catch (e) {
       emit(state.copyWith(isLoading: false, error: e.toString()));
     }
@@ -31,12 +40,27 @@ class ConfigCubit extends Cubit<ConfigState> {
   void selectModel(String? model) {
     emit(state.copyWith(selectedModel: model));
   }
+  
+  /// Updates the temperature in the state.
+  void selectTemperature(double? temperature) {
+    emit(state.copyWith(temperature: temperature));
+  }
+
+  void selectSystemPrompt(String? prompt) =>
+      emit(state.copyWith(systemPrompt: prompt));
+
+  void selectPdfContent(String? pdf) => emit(state.copyWith(pdfContent: pdf));
 
   Future<void> saveConfig() async {
     if (state.selectedModel == null) return;
     try {
       emit(state.copyWith(isSaving: true));
-      final cfg = ChatConfig(model: state.selectedModel!);
+      final cfg = ChatConfig(
+        model: state.selectedModel!,
+        temperature: state.temperature,
+        systemPrompt: state.systemPrompt,
+        pdfContent: state.pdfContent,
+      );
       await _setConfig.call(cfg);
       emit(state.copyWith(isSaving: false));
     } catch (e) {

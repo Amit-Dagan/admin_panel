@@ -21,18 +21,42 @@ class FirebaseChatConfigService implements ChatConfigService {
     final doc = await _collection.doc(_docId).get();
     if (doc.exists) {
       final data = doc.data() as Map<String, dynamic>;
-      final model = data['model'] as String? ?? 'gpt-3.5-turbo';
-      return ChatConfig(model: model);
+      final model = data['model'] as String?;
+      final tempRaw = data['temperature'];
+      double? temperature;
+      if (tempRaw is num) {
+        temperature = tempRaw.toDouble();
+      }
+      final systemPrompt = data['systemPrompt'] as String?;
+      final pdfContent = data['pdfContent'] as String?;
+      return ChatConfig(
+        model: model,
+        temperature: temperature,
+        systemPrompt: systemPrompt,
+        pdfContent: pdfContent,
+      );
     } else {
-      // Initialize with a default model if none exists
-      const defaultConfig = ChatConfig(model: 'gpt-3.5-turbo');
-      await setChatConfig(defaultConfig);
-      return defaultConfig;
+      // No configuration set yet
+      return const ChatConfig();
     }
   }
 
   @override
   Future<void> setChatConfig(ChatConfig config) async {
-    await _collection.doc(_docId).set({'model': config.model});
+    final data = <String, dynamic>{};
+    if (config.model != null) {
+      data['model'] = config.model;
+    }
+    if (config.temperature != null) {
+      data['temperature'] = config.temperature;
+    }
+    if (config.systemPrompt != null) {
+      data['systemPrompt'] = config.systemPrompt;
+    }
+    if (config.pdfContent != null) {
+      data['pdfContent'] = config.pdfContent;
+    }
+    if (data.isEmpty) return;
+    await _collection.doc(_docId).set(data, SetOptions(merge: true));
   }
 }

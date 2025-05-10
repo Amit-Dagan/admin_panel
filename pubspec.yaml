@@ -40,13 +40,15 @@ dependencies:
   dartz:
   cloud_firestore:
   responsive_framework: 
-  dart_openai: 
+  dart_openai: ^5.1.0
   flutter_secure_storage:
   dio:
   flutter_dotenv:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
+  file_picker: 
+  flutter_pdf_text:
 
 dev_dependencies:
   flutter_test:

@@ -1,13 +1,11 @@
 // data/datasources/chat_remote_data_source.dart
 import 'package:admin_panel/domain/entities/chat.dart';
 import 'package:admin_panel/domain/entities/chat_config.dart';
-import 'package:admin_panel/main.dart';
 import 'package:dart_openai/dart_openai.dart';
 import 'package:admin_panel/domain/repositories/chat/chat_config_repository.dart';
 import 'package:admin_panel/service_locator.dart';
-import 'package:flutter/material.dart';
 
-// A pure data-source that only knows about the SDK and returns a Message:
+/// A pure data-source that only knows about the SDK and returns a Message:
 abstract class ChatService {
   Future<Message> send(List<Message> history);
   Future<List<String>> getModels();
@@ -16,76 +14,82 @@ abstract class ChatService {
 class ChatServiceImpl implements ChatService {
   @override
   Future<Message> send(List<Message> history) async {
-    getModels();
-    // Load API key
-    // Fetch saved model configuration
+    // Optionally refresh available models
+    await getModels();
+
+    // Fetch saved chat configuration
     final config = await sl<ChatConfigRepository>().getChatConfig();
-    print('Using model: ${config.model}');
-    // last user message for debug
-    print(history.last.content);
-    // map domain → SDK model
-    final sdkHistory =
-        history
-            .map(
-              (m) => OpenAIChatCompletionChoiceMessageModel(
-                role: OpenAIChatMessageRole.values.byName(m.role.name),
-                content: [
-                  OpenAIChatCompletionChoiceMessageContentItemModel.text(
-                    m.content,
-                  ),
-                ],
-              ),
-            )
-            .toList();
+
+    // Build SDK history using ChoiceMessageModel
+    final sdkHistory = <OpenAIChatCompletionChoiceMessageModel>[];
+    if (config.systemPrompt != null) {
+      sdkHistory.add(OpenAIChatCompletionChoiceMessageModel(
+        role: OpenAIChatMessageRole.system,
+        content: [
+          OpenAIChatCompletionChoiceMessageContentItemModel.text(
+            config.systemPrompt!,
+          ),
+        ],
+      ));
+    }
+    if (config.pdfContent != null) {
+      sdkHistory.add(OpenAIChatCompletionChoiceMessageModel(
+        role: OpenAIChatMessageRole.system,
+        content: [
+          OpenAIChatCompletionChoiceMessageContentItemModel.text(
+            config.pdfContent!,
+          ),
+        ],
+      ));
+    }
+
+    // Map domain history into SDK ChoiceMessageModel
+    sdkHistory.addAll(history.map((m) => OpenAIChatCompletionChoiceMessageModel(
+          role: OpenAIChatMessageRole.values.byName(m.role.name),
+          content: [
+            OpenAIChatCompletionChoiceMessageContentItemModel.text(
+              m.content,
+            ),
+          ],
+        )));
 
     // Invoke chat completion with selected model
     final chat = await OpenAI.instance.chat.create(
-      model: config.model,
+      model: config.model ?? 'gpt-4',
       messages: sdkHistory,
+      temperature: config.temperature ?? 1.0,
     );
 
-    // extract assistant reply
+    // Extract assistant reply
     final sdkReply = chat.choices.first.message;
-    print("RAW CONTENT ITEMS: ${sdkReply.content}");
-    if (sdkReply.haveContent) {
-      for (var item in sdkReply.content!) {
-        print(
-          "  • type = ${item.type}, "
-          "text = ${item.text}, "
-          "imageUrl = ${item.imageUrl}, ",
-        );
-      }
-    }
-    final text = sdkReply.content!.map((c) => c.text).join().trim();
+    final text = sdkReply.content!
+        .map((item) => item.text)
+        .join()
+        .trim();
     print(text);
+
     return Message(role: Role.assistant, content: text);
   }
 
   @override
   Future<List<String>> getModels() async {
     final all = await OpenAI.instance.model.list();
-
-    final strings =
-        all
-            .map((m) => m.id)
-            // only GPT engines
-            .where((id) => id.startsWith('gpt-'))
-            // but drop anything clearly not a pure chat engine
-            .where((id) {
-              final l = id.toLowerCase();
-              return !l.contains('dall') // image-generation
-                  &&
-                  !l.contains('audio') &&
-                  !l.contains('image') &&
-                  !l.contains('embedding') &&
-                  !l.contains('search') &&
-                  !l.contains('preview') &&
-                  !l.contains('tts') &&
-                  !l.contains('transcribe') &&
-                  !l.contains('moderation');
-            })
-            .toList();
-    final configs = strings.map((model) => (ChatConfig(model: model))).toList();
+    final strings = all
+        .map((m) => m.id)
+        .where((id) => id.startsWith('gpt-'))
+        .where((id) {
+          final l = id.toLowerCase();
+          return !l.contains('dall') &&
+              !l.contains('audio') &&
+              !l.contains('image') &&
+              !l.contains('embedding') &&
+              !l.contains('search') &&
+              !l.contains('preview') &&
+              !l.contains('tts') &&
+              !l.contains('transcribe') &&
+              !l.contains('moderation');
+        })
+        .toList();
     return strings;
   }
 
